@@ -53,7 +53,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Description */}
         <p className="mt-1.5 text-xs text-slate-500 line-clamp-2 leading-relaxed flex-1">
-          {product.description || 'Producto de alta calidad para optimizar tu rendimiento.'}
+          {product.description || 'Producto de alta calidad.'}
         </p>
 
         {/* Category & Stock Indicators (Below Description) */}

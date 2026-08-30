@@ -23,20 +23,20 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => tokenStorage.getUser());
-  const [isLoading, setIsLoading] = useState<boolean>(() => {
-    // If no token exists on startup, we are not loading
-    if (typeof window !== 'undefined') {
-      return !!tokenStorage.getAccessToken();
-    }
-    return false;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     let isMounted = true;
 
     const verifySession = async () => {
+      const storedUser = tokenStorage.getUser();
       const accessToken = tokenStorage.getAccessToken();
+
+      if (storedUser && isMounted) {
+        setUser(storedUser);
+      }
+
       if (!accessToken) {
         if (isMounted) {
           setIsLoading(false);
