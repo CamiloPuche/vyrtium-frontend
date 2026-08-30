@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
+  const apiDocsUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/docs`;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
       {/* Top Navigation */}
@@ -24,7 +26,7 @@ export default function HomePage() {
 
           <div className="flex items-center gap-4 text-sm font-medium">
             <a
-              href="http://localhost:4000/api/docs"
+              href={apiDocsUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 text-slate-400 hover:text-slate-200 transition-colors"
@@ -33,12 +35,6 @@ export default function HomePage() {
               <span>Swagger API Docs</span>
               <ExternalLink className="w-3.5 h-3.5 opacity-60" />
             </a>
-            <Link
-              href="/login"
-              className="px-4 py-2 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 transition-all shadow-sm"
-            >
-              Iniciar Sesión
-            </Link>
           </div>
         </div>
       </header>
