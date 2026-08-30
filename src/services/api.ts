@@ -133,7 +133,7 @@ apiClient.interceptors.response.use(
         refreshToken,
       });
 
-      const newTokens: AuthTokens = data.data.tokens;
+      const newTokens: AuthTokens = data.data;
       tokenStorage.setSession(newTokens);
 
       if (originalRequest.headers) {
