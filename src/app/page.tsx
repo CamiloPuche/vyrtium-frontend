@@ -66,7 +66,7 @@ export default function HomePage() {
           </Link>
 
           <Link
-            href="/login"
+            href="/dashboard"
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 bg-slate-800/90 hover:bg-slate-800 text-slate-200 hover:text-white text-sm font-semibold rounded-xl border border-slate-700/80 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <ShieldCheck className="w-4 h-4 text-indigo-400" />

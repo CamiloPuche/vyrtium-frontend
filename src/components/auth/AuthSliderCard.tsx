@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -24,7 +24,14 @@ interface AuthSliderCardProps {
 export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   const router = useRouter();
-  const { login, register } = useAuth();
+  const { login, register, isAuthenticated, isLoading } = useAuth();
+
+  // Auto-redirect if session is already active
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
