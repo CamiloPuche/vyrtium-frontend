@@ -71,7 +71,7 @@ export function CategoryModal({
       />
 
       {/* Modal Card */}
-      <div className="relative w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-100 z-10 animate-scale-in">
+      <div className="relative w-full max-w-md bg-white rounded-3xl p-5 sm:p-8 shadow-2xl border border-slate-100 z-10 animate-scale-in max-h-[90dvh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
           <div className="flex items-center gap-3">

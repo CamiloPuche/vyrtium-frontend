@@ -84,7 +84,7 @@ export function ProductDetailModal({
   const inStock = product ? product.stock > 0 : false;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-3 sm:p-6">
       {/* Backdrop */}
       <div
         onClick={onClose}
@@ -92,11 +92,11 @@ export function ProductDetailModal({
       />
 
       {/* Modal Card */}
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-100 z-10 animate-scale-in max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-2xl bg-white rounded-3xl p-5 sm:p-8 shadow-2xl border border-slate-100 z-10 animate-scale-in max-h-[90dvh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+          className="absolute top-5 right-5 sm:top-6 sm:right-6 p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
           aria-label="Cerrar modal"
         >
           <X className="w-5 h-5" />
@@ -110,10 +110,10 @@ export function ProductDetailModal({
             </p>
           </div>
         ) : product ? (
-          <div className="space-y-6">
+          <div className="space-y-5 sm:space-y-6">
             {/* Header / Title */}
             <div className="pr-10">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100/60 px-2.5 py-0.5 rounded-full">
                   <Tag className="w-3 h-3" />
                   <span>{product.category?.name || 'Sin Categoría'}</span>
@@ -132,19 +132,19 @@ export function ProductDetailModal({
                 </span>
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
                 {product.name}
               </h2>
             </div>
 
             {/* Media Showcase */}
-            <div className="relative w-full h-56 sm:h-64 rounded-2xl bg-slate-100 border border-slate-200/80 overflow-hidden flex items-center justify-center">
+            <div className="relative w-full h-48 sm:h-64 rounded-2xl bg-slate-100 border border-slate-200/80 overflow-hidden flex items-center justify-center">
               {product.imageUrl ? (
                 <Image
                   src={product.imageUrl}
                   alt={product.name}
                   fill
-                  className="object-contain p-4"
+                  className="object-contain p-3 sm:p-4"
                   sizes="(max-width: 768px) 100vw, 600px"
                 />
               ) : (
@@ -158,14 +158,14 @@ export function ProductDetailModal({
             </div>
 
             {/* Price & Commercial Specs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {/* Price Box */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1 mb-1">
                   <DollarSign className="w-3 h-3 text-slate-400" />
                   <span>Precio de Venta</span>
                 </span>
-                <span className="text-2xl font-black text-slate-900 tracking-tight">
+                <span className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                   {formatCOP(product.price)}
                 </span>
               </div>
@@ -176,7 +176,7 @@ export function ProductDetailModal({
                   <Boxes className="w-3 h-3 text-slate-400" />
                   <span>Disponibilidad en Stock</span>
                 </span>
-                <span className="text-2xl font-black text-slate-900 tracking-tight">
+                <span className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                   {product.stock}{' '}
                   <span className="text-xs font-semibold text-slate-500">
                     unidades
@@ -197,15 +197,15 @@ export function ProductDetailModal({
 
             {/* System Metadata */}
             <div className="p-3.5 rounded-2xl bg-slate-100/70 border border-slate-200/60 text-xs text-slate-500 space-y-2">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
                 <span className="font-semibold text-slate-600">ID (UUID):</span>
                 <button
                   type="button"
                   onClick={handleCopyId}
-                  className="inline-flex items-center gap-1 font-mono text-[11px] bg-white px-2 py-0.5 rounded-lg border border-slate-200 hover:border-indigo-300 transition-colors text-slate-700 cursor-pointer"
+                  className="inline-flex items-center justify-between sm:justify-start gap-1 font-mono text-[11px] bg-white px-2 py-1 sm:py-0.5 rounded-lg border border-slate-200 hover:border-indigo-300 transition-colors text-slate-700 cursor-pointer"
                   title="Copiar UUID"
                 >
-                  <span className="truncate max-w-[200px] sm:max-w-none">
+                  <span className="truncate max-w-[240px] sm:max-w-none">
                     {product.id}
                   </span>
                   {copied ? (
@@ -216,14 +216,14 @@ export function ProductDetailModal({
                 </button>
               </div>
 
-              <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
+              <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60 text-[11px]">
                 <span className="flex items-center gap-1 font-medium">
                   <Calendar className="w-3 h-3 text-slate-400" />
-                  <span>Fecha de Registro:</span>
+                  <span>Fecha de Creación:</span>
                 </span>
-                <span className="font-medium text-slate-700">
+                <span className="font-bold text-slate-700">
                   {product.createdAt
-                    ? new Date(product.createdAt).toLocaleString('es-CO', {
+                    ? new Date(product.createdAt).toLocaleDateString('es-CO', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',
@@ -235,23 +235,20 @@ export function ProductDetailModal({
               </div>
             </div>
 
-            {/* Footer Actions */}
-            <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer"
+                className="px-4 sm:px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
               >
                 Cerrar
               </button>
 
               <button
                 type="button"
-                onClick={() => {
-                  onClose();
-                  onEdit(product);
-                }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-600/25 transition-all active:scale-98 cursor-pointer"
+                onClick={() => onEdit(product)}
+                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-600/25 transition-all active:scale-98 cursor-pointer"
               >
                 <Edit2 className="w-4 h-4" />
                 <span>Editar Producto</span>

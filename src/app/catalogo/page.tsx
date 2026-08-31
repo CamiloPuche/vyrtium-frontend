@@ -20,7 +20,7 @@ export default function CatalogoPage() {
   const [paginationMeta, setPaginationMeta] = useState<PaginationMeta>({
     total: 0,
     page: 1,
-    limit: 8,
+    limit: 12,
     totalPages: 1,
   });
 
@@ -106,7 +106,7 @@ export default function CatalogoPage() {
 
         const response = await productService.getPublicProducts({
           page: currentPage,
-          limit: 8,
+          limit: 12,
           search: debouncedSearch.trim() || undefined,
           categoryId: categoryFilter,
           sortBy,
@@ -174,11 +174,11 @@ export default function CatalogoPage() {
       />
 
       {/* Main Store Catalog Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         {/* Controls Bar: Category Pills & Sort Dropdown */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6 sm:mb-8">
           {/* Category Filter Pills */}
-          <div className="w-full md:flex-1">
+          <div className="w-full md:flex-1 min-w-0">
             <CategoryFilter
               categories={categories}
               selectedCategoryId={selectedCategoryId}
@@ -188,7 +188,7 @@ export default function CatalogoPage() {
           </div>
 
           {/* Sort Dropdown & Total Results Count */}
-          <div className="flex items-center gap-3 self-end md:self-auto shrink-0">
+          <div className="flex items-center justify-between md:justify-end gap-3 shrink-0">
             {!isLoadingProducts && (
               <span className="text-xs font-semibold text-slate-500 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs">
                 {paginationMeta?.total ?? 0} {paginationMeta?.total === 1 ? 'producto' : 'productos'}
@@ -227,7 +227,7 @@ export default function CatalogoPage() {
       </main>
 
       {/* E-Commerce Store Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8 mt-16">
+      <footer className="border-t border-slate-200 bg-white py-8 mt-12 sm:mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 text-center sm:text-left">
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-900 tracking-tight">VYRTIUM</span>
