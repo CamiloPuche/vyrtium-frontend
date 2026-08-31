@@ -41,7 +41,7 @@ export function CategoryTable({
 
   if (categories.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center shadow-xs flex flex-col items-center justify-center">
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-8 sm:p-12 text-center shadow-xs flex flex-col items-center justify-center">
         <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3">
           <PackageSearch className="w-7 h-7" />
         </div>
@@ -56,93 +56,167 @@ export function CategoryTable({
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-              <th className="py-3.5 px-6">Categoría</th>
-              <th className="py-3.5 px-6">Productos Asociados</th>
-              <th className="py-3.5 px-6">Fecha de Creación</th>
-              <th className="py-3.5 px-6 text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 text-xs">
-            {categories.map((cat) => {
-              const count = cat.productsCount ?? 0;
-              const formattedDate = cat.createdAt
-                ? new Date(cat.createdAt).toLocaleDateString('es-CO', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric',
-                  })
-                : '—';
+    <div className="space-y-3">
+      {/* ================= MOBILE CARD LIST VIEW (<md) ================= */}
+      <div className="md:hidden space-y-3">
+        {categories.map((cat) => {
+          const count = cat.productsCount ?? 0;
+          const formattedDate = cat.createdAt
+            ? new Date(cat.createdAt).toLocaleDateString('es-CO', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+              })
+            : '—';
 
-              return (
-                <tr
-                  key={cat.id}
-                  className="hover:bg-slate-50/60 transition-colors group"
+          return (
+            <div
+              key={cat.id}
+              className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs space-y-3"
+            >
+              {/* Header: Name + Badge */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100/60">
+                    <Tag className="w-4 h-4" />
+                  </div>
+                  <span className="font-bold text-slate-900 text-sm truncate">
+                    {cat.name}
+                  </span>
+                </div>
+
+                <span
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold shrink-0 ${
+                    count > 0
+                      ? 'bg-indigo-50 text-indigo-700 border border-indigo-100/60'
+                      : 'bg-slate-100 text-slate-500'
+                  }`}
                 >
-                  {/* Category Name */}
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100/60">
-                        <Tag className="w-4 h-4" />
+                  <Layers className="w-3 h-3" />
+                  <span>
+                    {count} {count === 1 ? 'prod.' : 'prods.'}
+                  </span>
+                </span>
+              </div>
+
+              {/* Date & Actions */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                <span className="text-[11px] text-slate-400 font-medium">
+                  Creado: {formattedDate}
+                </span>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => onEdit(cat)}
+                    className="flex items-center gap-1 py-1.5 px-3 bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 text-xs font-semibold rounded-xl border border-slate-200/70 transition-all cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Editar</span>
+                  </button>
+
+                  <button
+                    onClick={() => onDelete(cat)}
+                    className="flex items-center gap-1 py-1.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-xl border border-rose-200/60 transition-all cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Eliminar</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ================= DESKTOP TABLE VIEW (>=md) ================= */}
+      <div className="hidden md:block bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <th className="py-3.5 px-6">Categoría</th>
+                <th className="py-3.5 px-6">Productos Asociados</th>
+                <th className="py-3.5 px-6">Fecha de Creación</th>
+                <th className="py-3.5 px-6 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-xs">
+              {categories.map((cat) => {
+                const count = cat.productsCount ?? 0;
+                const formattedDate = cat.createdAt
+                  ? new Date(cat.createdAt).toLocaleDateString('es-CO', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                    })
+                  : '—';
+
+                return (
+                  <tr
+                    key={cat.id}
+                    className="hover:bg-slate-50/60 transition-colors group"
+                  >
+                    {/* Category Name */}
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100/60">
+                          <Tag className="w-4 h-4" />
+                        </div>
+                        <span className="font-bold text-slate-900 text-sm">
+                          {cat.name}
+                        </span>
                       </div>
-                      <span className="font-bold text-slate-900 text-sm">
-                        {cat.name}
-                      </span>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* Associated Products Count */}
-                  <td className="py-4 px-6">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
-                        count > 0
-                          ? 'bg-indigo-50 text-indigo-700 border border-indigo-100/60'
-                          : 'bg-slate-100 text-slate-500'
-                      }`}
-                    >
-                      <Layers className="w-3.5 h-3.5" />
-                      <span>
-                        {count} {count === 1 ? 'producto' : 'productos'}
-                      </span>
-                    </span>
-                  </td>
-
-                  {/* Created Date */}
-                  <td className="py-4 px-6 text-slate-500 font-medium">
-                    {formattedDate}
-                  </td>
-
-                  {/* Actions */}
-                  <td className="py-4 px-6 text-right">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <button
-                        onClick={() => onEdit(cat)}
-                        className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all cursor-pointer"
-                        title="Editar categoría"
-                        aria-label={`Editar categoría ${cat.name}`}
+                    {/* Associated Products Count */}
+                    <td className="py-4 px-6">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
+                          count > 0
+                            ? 'bg-indigo-50 text-indigo-700 border border-indigo-100/60'
+                            : 'bg-slate-100 text-slate-500'
+                        }`}
                       >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
+                        <Layers className="w-3.5 h-3.5" />
+                        <span>
+                          {count} {count === 1 ? 'producto' : 'productos'}
+                        </span>
+                      </span>
+                    </td>
 
-                      <button
-                        onClick={() => onDelete(cat)}
-                        className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer"
-                        title="Eliminar categoría"
-                        aria-label={`Eliminar categoría ${cat.name}`}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    {/* Created Date */}
+                    <td className="py-4 px-6 text-slate-500 font-medium">
+                      {formattedDate}
+                    </td>
+
+                    {/* Actions */}
+                    <td className="py-4 px-6 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => onEdit(cat)}
+                          className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all cursor-pointer"
+                          title="Editar categoría"
+                          aria-label={`Editar categoría ${cat.name}`}
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => onDelete(cat)}
+                          className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer"
+                          title="Eliminar categoría"
+                          aria-label={`Eliminar categoría ${cat.name}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
