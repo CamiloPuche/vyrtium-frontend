@@ -8,14 +8,15 @@ import { productService } from '../../services/product.service';
 import { getApiErrorMessage } from '../../lib/utils';
 import {
   X,
-  Package,
   UploadCloud,
-  Image as ImageIcon,
-  Loader2,
+  Package,
   DollarSign,
   Boxes,
-  Tag,
   FileText,
+  Tag,
+  Image as ImageIcon,
+  Loader2,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -34,43 +35,52 @@ export function ProductModal({
   productToEdit,
   categories,
 }: ProductModalProps) {
-  const isEditing = !!productToEdit;
+  const isEditing = Boolean(productToEdit);
 
   // Form State
-  const [name, setName] = useState(productToEdit?.name ?? '');
-  const [categoryId, setCategoryId] = useState(
-    productToEdit?.categoryId ?? (categories[0]?.id || '')
+  const [name, setName] = useState<string>(productToEdit?.name || '');
+  const [description, setDescription] = useState<string>(
+    productToEdit?.description || ''
   );
   const [price, setPrice] = useState<string>(
-    productToEdit?.price !== undefined ? productToEdit.price.toString() : ''
+    productToEdit?.price !== undefined ? String(productToEdit.price) : ''
   );
   const [stock, setStock] = useState<string>(
-    productToEdit?.stock !== undefined ? productToEdit.stock.toString() : '0'
+    productToEdit?.stock !== undefined ? String(productToEdit.stock) : '0'
   );
-  const [description, setDescription] = useState(
-    productToEdit?.description ?? ''
+  const [categoryId, setCategoryId] = useState<string>(
+    productToEdit?.categoryId || categories[0]?.id || ''
   );
 
   // Image Upload State
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(
-    productToEdit?.imageUrl ?? null
+    productToEdit?.imageUrl || null
   );
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isDragOver, setIsDragOver] = useState<boolean>(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('La imagen no debe superar los 5MB');
-        return;
-      }
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+  const handleFileChange = (file: File | null) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Solo se permiten archivos de imagen (JPEG, PNG, WebP, GIF)');
+      return;
     }
+
+    // 5MB limit
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('La imagen no puede exceder los 5MB');
+      return;
+    }
+
+    setSelectedFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
   };
 
   const handleRemoveImage = () => {
@@ -101,8 +111,16 @@ export function ProductModal({
       toast.error('El precio debe ser un número mayor a 0');
       return;
     }
+    if (parsedPrice > 99999999.99) {
+      toast.error('El precio no puede exceder $99.999.999 COP');
+      return;
+    }
     if (isNaN(parsedStock) || parsedStock < 0) {
       toast.error('El stock no puede ser negativo');
+      return;
+    }
+    if (parsedStock > 1000000) {
+      toast.error('El stock no puede exceder 1.000.000 unidades');
       return;
     }
 
@@ -178,18 +196,20 @@ export function ProductModal({
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+            aria-label="Cerrar modal"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Row 1: Name */}
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Row 1: Product Name */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-              Nombre del Producto <span className="text-rose-500">*</span>
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <Package className="w-3.5 h-3.5 text-slate-400" />
+              <span>Nombre del Producto</span> <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
@@ -197,13 +217,14 @@ export function ProductModal({
               onChange={(e) => setName(e.target.value)}
               placeholder="Ej. Proteína Whey Isolate 2kg"
               required
+              maxLength={255}
               className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
             />
           </div>
 
           {/* Row 2: Category & Price */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Category Dropdown */}
+            {/* Category Select */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                 <Tag className="w-3.5 h-3.5 text-slate-400" />
@@ -213,10 +234,10 @@ export function ProductModal({
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
               >
                 <option value="" disabled>
-                  Selecciona una categoría...
+                  Selecciona una categoría
                 </option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
@@ -239,6 +260,7 @@ export function ProductModal({
                 onWheel={(e) => (e.target as HTMLElement).blur()}
                 placeholder="Ej. 185000"
                 min="1"
+                max="99999999"
                 step="any"
                 required
                 className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -260,6 +282,7 @@ export function ProductModal({
               onWheel={(e) => (e.target as HTMLElement).blur()}
               placeholder="Ej. 50"
               min="0"
+              max="1000000"
               step="1"
               required
               className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -277,6 +300,7 @@ export function ProductModal({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Detalla las características, beneficios o modo de uso del producto..."
               rows={3}
+              maxLength={2000}
               className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none"
             />
           </div>
@@ -289,63 +313,86 @@ export function ProductModal({
             </label>
 
             {previewUrl ? (
-              <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center group">
+              <div className="relative w-full h-44 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center group">
                 <Image
                   src={previewUrl}
-                  alt="Vista previa"
+                  alt="Vista previa del producto"
                   fill
-                  className="object-contain p-2"
-                  unoptimized={previewUrl.startsWith('blob:')}
+                  className="object-cover"
                 />
-                <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-2xs">
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-3 py-1.5 bg-white text-slate-900 text-xs font-bold rounded-lg shadow-md hover:bg-slate-100 transition-all cursor-pointer"
+                    className="px-3.5 py-2 bg-white text-slate-900 text-xs font-bold rounded-xl shadow-md hover:bg-slate-100 transition-all cursor-pointer"
                   >
                     Cambiar Imagen
                   </button>
                   <button
                     type="button"
                     onClick={handleRemoveImage}
-                    className="px-3 py-1.5 bg-rose-600 text-white text-xs font-bold rounded-lg shadow-md hover:bg-rose-700 transition-all cursor-pointer"
+                    className="p-2 bg-rose-600 text-white rounded-xl shadow-md hover:bg-rose-700 transition-all cursor-pointer"
+                    title="Eliminar imagen"
                   >
-                    Quitar
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             ) : (
               <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragOver(true);
+                }}
+                onDragLeave={() => setIsDragOver(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragOver(false);
+                  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    handleFileChange(e.dataTransfer.files[0]);
+                  }
+                }}
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full h-36 rounded-2xl border-2 border-dashed border-slate-200 hover:border-indigo-400 bg-slate-50 hover:bg-indigo-50/40 transition-colors flex flex-col items-center justify-center p-4 cursor-pointer text-center group"
+                className={`w-full border-2 border-dashed rounded-2xl p-6 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-2 ${
+                  isDragOver
+                    ? 'border-indigo-500 bg-indigo-50/50'
+                    : 'border-slate-300 hover:border-indigo-400 bg-slate-50/50 hover:bg-slate-50'
+                }`}
               >
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 group-hover:bg-indigo-100 text-indigo-600 flex items-center justify-center mb-2 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-xs">
                   <UploadCloud className="w-5 h-5" />
                 </div>
-                <p className="text-xs font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">
-                  Haz clic o arrastra un archivo de imagen
-                </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  Formatos permitidos: PNG, JPG, WEBP (máx. 5MB)
-                </p>
+                <div>
+                  <p className="text-xs font-bold text-slate-700">
+                    Haz clic para subir o arrastra una imagen aquí
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    PNG, JPG, WebP o GIF (Máx. 5MB) · Se alojará en Cloudinary
+                  </p>
+                </div>
               </div>
             )}
 
             <input
-              ref={fileInputRef}
               type="file"
-              accept="image/png,image/jpeg,image/webp,image/jpg"
-              onChange={handleFileChange}
+              ref={fileInputRef}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleFileChange(e.target.files[0]);
+                }
+              }}
+              accept="image/*"
               className="hidden"
             />
           </div>
 
-          {/* Footer Actions */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+          {/* Action Buttons */}
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer"
+              disabled={isSubmitting}
+              className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
             >
               Cancelar
             </button>
@@ -358,7 +405,7 @@ export function ProductModal({
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Subiendo y guardando...</span>
+                  <span>Guardando...</span>
                 </>
               ) : (
                 <span>{isEditing ? 'Guardar Cambios' : 'Crear Producto'}</span>
