@@ -19,7 +19,7 @@ export function CategoryFilter({
 }: CategoryFilterProps) {
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 overflow-x-auto py-2 scrollbar-none animate-pulse">
+      <div className="flex items-center gap-2 overflow-x-auto py-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none animate-pulse">
         {[1, 2, 3, 4, 5].map((i) => (
           <div
             key={i}
@@ -32,11 +32,11 @@ export function CategoryFilter({
 
   return (
     <div className="w-full">
-      <div className="flex items-center gap-2 overflow-x-auto py-2 scrollbar-none">
+      <div className="flex items-center gap-2 overflow-x-auto py-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
         {/* "Todos" pill */}
         <button
           onClick={() => onSelectCategory('')}
-          className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
+          className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
             selectedCategoryId === ''
               ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
               : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
@@ -53,7 +53,7 @@ export function CategoryFilter({
             <button
               key={cat.id}
               onClick={() => onSelectCategory(cat.id)}
-              className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
+              className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 isSelected
                   ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
                   : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'

@@ -1,21 +1,22 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
+import { getApiErrorMessage } from '../../lib/utils';
 import {
   Mail,
   Lock,
   User as UserIcon,
   Eye,
   EyeOff,
+  ShoppingBag,
   ArrowRight,
   Sparkles,
-  ShoppingBag,
+  ShieldCheck,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import Link from 'next/link';
-import { getApiErrorMessage } from '../../lib/utils';
 
 interface AuthSliderCardProps {
   initialMode?: 'login' | 'register';
@@ -23,15 +24,15 @@ interface AuthSliderCardProps {
 
 export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+  const { user, login, register } = useAuth();
   const router = useRouter();
-  const { login, register, isAuthenticated, isLoading } = useAuth();
 
-  // Auto-redirect if session is already active
+  // If user is already authenticated, redirect to dashboard automatically
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (user) {
       router.replace('/dashboard');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [user, router]);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -48,18 +49,21 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!loginEmail || !loginPassword) {
+    if (!loginEmail.trim() || !loginPassword) {
       toast.error('Por favor completa todos los campos');
       return;
     }
 
     try {
       setIsSubmittingLogin(true);
-      await login({ email: loginEmail.trim(), password: loginPassword });
-      toast.success('¡Inicio de sesión exitoso!');
+      await login({
+        email: loginEmail.trim(),
+        password: loginPassword,
+      });
+      toast.success('¡Bienvenido de vuelta!');
       router.push('/dashboard');
     } catch (err: unknown) {
-      const errorMsg = getApiErrorMessage(err, 'Credenciales inválidas');
+      const errorMsg = getApiErrorMessage(err, 'Error al iniciar sesión');
       toast.error(errorMsg);
     } finally {
       setIsSubmittingLogin(false);
@@ -68,8 +72,8 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!registerName || !registerEmail || !registerPassword) {
-      toast.error('Por favor completa todos los campos requeridos');
+    if (!registerName.trim() || !registerEmail.trim() || !registerPassword) {
+      toast.error('Por favor completa todos los campos');
       return;
     }
 
@@ -96,26 +100,26 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
   };
 
   return (
-    <div className="relative w-full max-w-4xl min-h-[580px] bg-slate-100 rounded-[2.5rem] p-3 sm:p-4 shadow-2xl overflow-hidden border border-slate-200/80">
+    <div className="relative w-full max-w-4xl min-h-[500px] md:min-h-[580px] bg-slate-100 rounded-3xl md:rounded-[2.5rem] p-3 sm:p-4 shadow-2xl overflow-hidden border border-slate-200/80">
       {/* Back to Store link */}
       <Link
         href="/"
-        className="absolute top-6 left-6 z-30 inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors"
+        className="absolute top-5 left-5 z-30 inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 bg-white/80 backdrop-blur-xs px-3 py-1.5 rounded-full border border-slate-200/60 transition-colors shadow-2xs"
       >
-        <ShoppingBag className="w-4 h-4 text-indigo-600" />
+        <ShoppingBag className="w-3.5 h-3.5 text-indigo-600" />
         <span>Ir a Inicio</span>
       </Link>
 
-      <div className="relative w-full h-full min-h-[540px] flex overflow-hidden rounded-[2rem] bg-white">
-        {/* ================= REGISTER FORM (Left side in Register mode) ================= */}
+      <div className="relative w-full h-full min-h-[460px] md:min-h-[540px] flex overflow-hidden rounded-2xl md:rounded-[2rem] bg-white">
+        {/* ================= REGISTER FORM ================= */}
         <div
-          className={`w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center transition-all duration-700 ease-in-out ${
+          className={`w-full md:w-1/2 p-6 sm:p-8 md:p-12 flex flex-col justify-center transition-all duration-700 ease-in-out ${
             mode === 'register'
-              ? 'opacity-100 z-20 translate-x-0'
-              : 'opacity-0 z-10 pointer-events-none md:translate-x-full'
+              ? 'flex opacity-100 z-20 translate-x-0'
+              : 'hidden md:flex opacity-0 z-10 pointer-events-none md:translate-x-full'
           }`}
         >
-          <div className="max-w-sm mx-auto w-full">
+          <div className="max-w-sm mx-auto w-full pt-6 md:pt-0">
             <div className="text-center mb-6">
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                 Crear Cuenta
@@ -125,7 +129,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
               </p>
             </div>
 
-            <form onSubmit={handleRegisterSubmit} className="space-y-4">
+            <form onSubmit={handleRegisterSubmit} className="space-y-3.5 sm:space-y-4">
               {/* Name Field */}
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
@@ -173,14 +177,15 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
                     type={showRegisterPassword ? 'text' : 'password'}
                     value={registerPassword}
                     onChange={(e) => setRegisterPassword(e.target.value)}
-                    placeholder="Mínimo 8 caracteres"
+                    placeholder="••••••••"
                     required
+                    minLength={8}
                     className="w-full pl-10 pr-10 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
                   >
                     {showRegisterPassword ? (
                       <EyeOff className="w-4 h-4" />
@@ -197,7 +202,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
                 disabled={isSubmittingRegister}
                 className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-600/20 transition-all active:scale-98 cursor-pointer mt-2"
               >
-                {isSubmittingRegister ? 'Registrando...' : 'Registrarse'}
+                {isSubmittingRegister ? 'Creando cuenta...' : 'Crear Cuenta'}
               </button>
             </form>
 
@@ -206,6 +211,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
               <p className="text-xs text-slate-500">
                 ¿Ya tienes una cuenta?{' '}
                 <button
+                  type="button"
                   onClick={() => setMode('login')}
                   className="font-bold text-indigo-600 hover:underline cursor-pointer"
                 >
@@ -216,15 +222,15 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
           </div>
         </div>
 
-        {/* ================= LOGIN FORM (Right side in Login mode) ================= */}
+        {/* ================= LOGIN FORM ================= */}
         <div
-          className={`w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center transition-all duration-700 ease-in-out md:absolute md:right-0 md:h-full ${
+          className={`w-full md:w-1/2 p-6 sm:p-8 md:p-12 flex flex-col justify-center transition-all duration-700 ease-in-out ${
             mode === 'login'
-              ? 'opacity-100 z-20 translate-x-0'
-              : 'opacity-0 z-10 pointer-events-none md:-translate-x-full'
+              ? 'flex opacity-100 z-20 translate-x-0 md:translate-x-full'
+              : 'hidden md:flex opacity-0 z-10 pointer-events-none md:translate-x-0'
           }`}
         >
-          <div className="max-w-sm mx-auto w-full">
+          <div className="max-w-sm mx-auto w-full pt-6 md:pt-0">
             <div className="text-center mb-6">
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                 Iniciar Sesión
@@ -234,7 +240,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
               </p>
             </div>
 
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <form onSubmit={handleLoginSubmit} className="space-y-3.5 sm:space-y-4">
               {/* Email Field */}
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
@@ -246,7 +252,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
                     type="email"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
-                    placeholder="usuario@ejemplo.com"
+                    placeholder="admin@vyrtium.com"
                     required
                     className="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
                   />
@@ -271,7 +277,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
                   <button
                     type="button"
                     onClick={() => setShowLoginPassword(!showLoginPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
                   >
                     {showLoginPassword ? (
                       <EyeOff className="w-4 h-4" />
@@ -288,7 +294,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
                 disabled={isSubmittingLogin}
                 className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-600/20 transition-all active:scale-98 cursor-pointer mt-2"
               >
-                {isSubmittingLogin ? 'Iniciando...' : 'Iniciar Sesión'}
+                {isSubmittingLogin ? 'Iniciando sesión...' : 'Iniciar Sesión'}
               </button>
             </form>
 
@@ -297,6 +303,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
               <p className="text-xs text-slate-500">
                 ¿No tienes una cuenta?{' '}
                 <button
+                  type="button"
                   onClick={() => setMode('register')}
                   className="font-bold text-indigo-600 hover:underline cursor-pointer"
                 >
@@ -343,6 +350,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
                     ¿Aún no tienes una cuenta de administrador registrada en la plataforma?
                   </p>
                   <button
+                    type="button"
                     onClick={() => setMode('register')}
                     className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border-2 border-white/80 text-white text-xs font-bold hover:bg-white hover:text-indigo-700 transition-all active:scale-95 cursor-pointer shadow-sm"
                   >
@@ -359,6 +367,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
                     ¿Ya posees una cuenta activa? Inicia sesión para acceder al panel de control.
                   </p>
                   <button
+                    type="button"
                     onClick={() => setMode('login')}
                     className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border-2 border-white/80 text-white text-xs font-bold hover:bg-white hover:text-indigo-700 transition-all active:scale-95 cursor-pointer shadow-sm"
                   >
@@ -367,6 +376,11 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
                   </button>
                 </>
               )}
+            </div>
+
+            <div className="flex items-center gap-2 text-[11px] text-indigo-200 font-medium">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Acceso seguro protegido con tokens JWT</span>
             </div>
           </div>
         </div>

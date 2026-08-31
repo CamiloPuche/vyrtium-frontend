@@ -57,6 +57,7 @@ La arquitectura del frontend sigue los principios de **Container-Presentational 
 - [05 · Panel de Control & CRUD de Categorías con Conteo Relacional](docs/05-category-crud-spec.md)
 - [06 · Gestión de Productos, Dropzone Cloudinary & Precios COP](docs/06-product-crud-spec.md)
 - [07 · Trade-offs de Validación de Entradas y Límites Numéricos](docs/07-input-validation-tradeoffs-spec.md)
+- [08 · Rediseño Responsive Mobile-First y Paginación de Catálogo](docs/08-mobile-responsive-and-pagination-spec.md)
 
 ---
 
