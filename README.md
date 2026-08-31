@@ -4,29 +4,37 @@ Frontend moderno, reactivo y de alto rendimiento para la plataforma de comercio 
 
 ---
 
+## 🌐 Enlaces en Producción (Live Demo)
+
+- **🚀 Tienda Online & Panel Administrativo (Vercel):** [https://vyrtium-frontend.vercel.app/](https://vyrtium-frontend.vercel.app/)
+- **🔌 API REST Backend (Render):** [https://vyrtium-backend.onrender.com](https://vyrtium-backend.onrender.com)
+- **📖 Documentación Swagger UI:** [https://vyrtium-backend.onrender.com/api/docs/](https://vyrtium-backend.onrender.com/api/docs/)
+
+---
+
 ## 🌟 Características Principales
 
 ### 🏪 1. Catálogo Comercial Público (`/catalogo`)
 - **Experiencia de Tienda Online:** Catálogo comercial con diseño retail moderno, tarjetas de producto con badges de categoría e indicador de disponibilidad en inventario.
-- **Precios en Pesos Colombianos:** Formateo localizado de moneda (`formatCOP`).
+- **Precios en Pesos Colombianos (COP):** Formateo localizado de moneda (`formatCOP`).
 - **Carrito de Compras Deslizante (Slide-over Drawer):** Carrito interactivo con control de cantidades `+`/`-`, límites de stock, cálculo reactivo de subtotales y persistencia en `localStorage`.
-- **Filtros Dinámicos:** Píldoras de filtrado por categoría descubiertas automáticamente y búsqueda por texto con *debouncing* (300ms).
-- **Paginación Sincronizada:** Navegación por páginas de resultados optimizada.
+- **Filtros Dinámicos & Paginación Base 12:** Píldoras de filtrado por categoría descubiertas automáticamente, búsqueda por texto con *debouncing* (300ms) y paginación en `limit: 12`.
 
 ### 🔐 2. Autenticación & Control de Sesión (`/login` & `/registro`)
-- **Tarjeta Deslizante Unificada (Morphing Slider):** Vista única con transición visual fluida entre formularios de inicio de sesión y registro de usuario.
+- **Tarjeta Deslizante Unificada (Morphing Slider):** Vista única con transición visual fluida de 700ms en desktop y aislamiento condicional responsive en móvil.
 - **Rotación de Tokens JWT:** Gestión de `accessToken` en memoria/storage y renovación automática con `refreshToken` vía interceptor de Axios.
 - **Rutas Protegidas (`<ProtectedRoute>`):** Verificación de sesión en cliente y servidor; redirección automática para usuarios sin credenciales activas.
 
 ### 🏷️ 3. Panel de Administración · Gestión de Categorías (`/dashboard/categorias`)
-- **Tabla Comercial con Métricas:** Listado con badge dinámico del conteo de productos asociados (`productsCount`).
+- **Patrón Dual (Tabla Desktop / Tarjetas Móvil):** Visualización tabular en desktop y tarjetas táctiles en móvil sin requerir scroll horizontal.
+- **Métricas Relacionales:** Conteo dinámico de productos asociados (`productsCount`).
 - **Buscador en Memoria:** Filtrado instantáneo por nombre en tiempo real.
-- **Modales Accesibles:** Creación y edición con validación y prevención de doble clic.
 - **Borrado Seguro:** Confirmación amigable con bloqueo preventivo y manejo del error relacional (`409 Conflict`) si la categoría posee productos activos.
 
 ### 📦 4. Gestión de Productos & Cloudinary (`/dashboard/productos`)
 - **Subida de Imágenes a Cloudinary:** Dropzone interactivo para arrastrar y soltar archivos (`multipart/form-data`) con previsualización instantánea antes de enviar al servidor.
-- **Formulario Completo:** Asignación de categorías, precios en COP, descripción comercial y control de stock.
+- **Formulario Completo:** Asignación de categorías, precios en COP, descripción comercial y control de stock con validación de límites superiores.
+- **Modal de Detalle (`ProductDetailModal`):** Visualización completa consumiendo en vivo `GET /api/products/:id` con UUID copiable y timestamps.
 - **Prevención de Scroll Accidental:** Bloqueo del evento `wheel` en inputs numéricos para evitar modificaciones involuntarias de precios y existencias.
 - **Filtros Combinados:** Búsqueda por texto, selector de categoría, ordenamiento múltiple (*precio, stock, fecha, nombre*) y paginación.
 
@@ -71,7 +79,9 @@ vyrtium-frontend/
 │   ├── 03-public-landing-spec.md
 │   ├── 04-auth-views-spec.md
 │   ├── 05-category-crud-spec.md
-│   └── 06-product-crud-spec.md
+│   ├── 06-product-crud-spec.md
+│   ├── 07-input-validation-tradeoffs-spec.md
+│   └── 08-mobile-responsive-and-pagination-spec.md
 ├── public/                             # Assets estáticos
 ├── src/
 │   ├── app/                            # Rutas de Next.js (App Router)
@@ -120,8 +130,6 @@ Crea un archivo `.env.local` en la raíz de `vyrtium-frontend`:
 # URL base de la API REST del backend
 NEXT_PUBLIC_API_URL=http://localhost:4000/api
 ```
-
-> **Nota para producción:** Al desplegar en Vercel, configura `NEXT_PUBLIC_API_URL` apuntando a tu instancia en Render (ej. `https://vyrtium-backend.onrender.com/api`).
 
 ---
 
