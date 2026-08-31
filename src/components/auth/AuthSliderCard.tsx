@@ -27,6 +27,11 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
   const { user, login, register } = useAuth();
   const router = useRouter();
 
+  // Keep internal mode synced if initialMode prop changes
+  useEffect(() => {
+    setMode(initialMode);
+  }, [initialMode]);
+
   // If user is already authenticated, redirect to dashboard automatically
   useEffect(() => {
     if (user) {
@@ -100,7 +105,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
   };
 
   return (
-    <div className="relative w-full max-w-4xl min-h-[500px] md:min-h-[580px] bg-slate-100 rounded-3xl md:rounded-[2.5rem] p-3 sm:p-4 shadow-2xl overflow-hidden border border-slate-200/80">
+    <div className="relative w-full max-w-4xl min-h-[520px] md:min-h-[580px] bg-slate-100 rounded-3xl md:rounded-[2.5rem] p-3 sm:p-4 shadow-2xl overflow-hidden border border-slate-200/80">
       {/* Back to Store link */}
       <Link
         href="/"
@@ -110,16 +115,16 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
         <span>Ir a Inicio</span>
       </Link>
 
-      <div className="relative w-full h-full min-h-[460px] md:min-h-[540px] flex overflow-hidden rounded-2xl md:rounded-[2rem] bg-white">
-        {/* ================= REGISTER FORM ================= */}
+      <div className="relative w-full h-full min-h-[480px] md:min-h-[540px] flex overflow-hidden rounded-2xl md:rounded-[2rem] bg-white">
+        {/* ================= REGISTER FORM (Left Column on Desktop) ================= */}
         <div
           className={`w-full md:w-1/2 p-6 sm:p-8 md:p-12 flex flex-col justify-center transition-all duration-700 ease-in-out ${
             mode === 'register'
-              ? 'flex opacity-100 z-20 translate-x-0'
-              : 'hidden md:flex opacity-0 z-10 pointer-events-none md:translate-x-full'
+              ? 'flex opacity-100 z-20 pointer-events-auto'
+              : 'hidden md:flex opacity-0 z-10 pointer-events-none'
           }`}
         >
-          <div className="max-w-sm mx-auto w-full pt-6 md:pt-0">
+          <div className="max-w-sm mx-auto w-full pt-8 md:pt-0">
             <div className="text-center mb-6">
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                 Crear Cuenta
@@ -169,7 +174,7 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
               {/* Password Field */}
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                  Contraseña
+                  Contraseña (Mín. 8 caracteres)
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -222,15 +227,15 @@ export function AuthSliderCard({ initialMode = 'login' }: AuthSliderCardProps) {
           </div>
         </div>
 
-        {/* ================= LOGIN FORM ================= */}
+        {/* ================= LOGIN FORM (Right Column on Desktop) ================= */}
         <div
           className={`w-full md:w-1/2 p-6 sm:p-8 md:p-12 flex flex-col justify-center transition-all duration-700 ease-in-out ${
             mode === 'login'
-              ? 'flex opacity-100 z-20 translate-x-0 md:translate-x-full'
-              : 'hidden md:flex opacity-0 z-10 pointer-events-none md:translate-x-0'
+              ? 'flex opacity-100 z-20 pointer-events-auto'
+              : 'hidden md:flex opacity-0 z-10 pointer-events-none'
           }`}
         >
-          <div className="max-w-sm mx-auto w-full pt-6 md:pt-0">
+          <div className="max-w-sm mx-auto w-full pt-8 md:pt-0">
             <div className="text-center mb-6">
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                 Iniciar Sesión
